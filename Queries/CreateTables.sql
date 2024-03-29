@@ -1,7 +1,15 @@
--- Active: 1711727273971@@dpg-co3e3q821fec73900qf0-a.singapore-postgres.render.com@5432@remote_pg_db_j36o@public
 
--- user table 
+-- dropping everything in the right order 
+-- dropping accommodatio table 
+DROP TABLE IF EXISTS accommodation;
+DROP TYPE IF EXISTS public.payment_enum;  
+DROP TYPE IF EXISTS public.category_enum; 
+
+-- dropping user table 
 DROP TABLE IF EXISTS "user";
+DROP TYPE IF EXISTS public.gender_enum; 
+
+-- create user table 
 CREATE TYPE public.gender_enum AS ENUM ('MALE', 'FEMALE', 'OTHER');
 
 CREATE TABLE "public"."user" (
@@ -18,8 +26,7 @@ CREATE TABLE "public"."user" (
     role             VARCHAR(50) DEFAULT 'USER'
 );
 
--- accommodatio table 
-DROP TABLE IF EXISTS accommodation;
+-- create accommodation table 
 CREATE TYPE public.payment_enum AS ENUM ('per_night', 'per_week', 'per_month', 'other');
 CREATE TYPE public.category_enum AS ENUM ('Hotel', 'House', 'Flat', 'Villa', 'Cabin');
 
@@ -40,5 +47,3 @@ CREATE TABLE accommodation (
     userID             INT,
     CONSTRAINT fk_accommodation_user FOREIGN KEY (userID) REFERENCES "user" (userID) ON UPDATE CASCADE ON DELETE CASCADE
 );
-
-
