@@ -15,3 +15,5 @@ CREATE TABLE "public"."user" (
     telephone        VARCHAR(20),
     role             VARCHAR(50) DEFAULT 'USER'
 );
+
+
