@@ -31,7 +31,8 @@ CREATE TABLE "public"."user" (
     description      TEXT,
     email            VARCHAR(255) NOT NULL,
     telephone        VARCHAR(20),
-    role             VARCHAR(50) DEFAULT 'USER'
+    role             VARCHAR(50) DEFAULT 'USER',
+    registered_since DATE DEFAULT CURRENT_DATE 
 );
 
 -- create accommodation table 
