@@ -1,0 +1,79 @@
+-- Step 1: Check and Identify same names
+SELECT Name, COUNT(*)
+FROM amenity
+GROUP BY Name
+HAVING COUNT(*) > 1;
+
+-- Step 2: Delete same entries if existing 
+DELETE FROM amenity
+WHERE amenityID NOT IN (
+    SELECT MIN(amenityID)
+    FROM amenity
+    GROUP BY LOWER(Name)
+);
+
+-- Step 3: Create unique Index for names in amenities
+CREATE UNIQUE INDEX idx_unique_amenity_name ON amenity (LOWER(Name));
+
+-- Step 4: Add Amenities with values 
+INSERT INTO amenity (Name)
+VALUES 
+    ('wifi internet access'),
+    ('parking'),
+    ('air conditioning'),
+    ('heating'),
+    ('breakfast service'),
+    ('swimming pool'),
+    ('fitness center'),
+    ('television'),
+    ('kitchen or kitchenette'),
+    ('washing machine/dryer'),
+    ('pet-friendly'),
+    ('non-smoking rooms'),
+    ('bar or restaurant'),
+    ('garden or terrace'),
+    ('disabled access');
+
+-- Step 5: Create unique constraint for accommodationID and amenityID in accommodation_amenities
+ALTER TABLE accommodation_amenities
+ADD CONSTRAINT unique_accommodation_amenity
+UNIQUE (accommodationID, amenityID);
+
+-- Create or update an accommodation and its amenities
+DO $$
+DECLARE
+       accommodation_id_to_edit INT := 1;  -- accommidationID from the accommodation that should be edited 
+       amenity_id_wifi INT;
+       amenity_id_parking INT;
+       amenity_id_disabled INT;
+BEGIN
+    -- Fetch amenities 
+    SELECT amenityID INTO amenity_id_wifi FROM amenity WHERE LOWER(Name) = LOWER('Wifi internet access');
+    SELECT amenityID INTO amenity_id_parking FROM amenity WHERE LOWER(Name) = LOWER('Parking');
+    SELECT amenityID INTO amenity_id_disabled FROM amenity WHERE LOWER(Name) = LOWER('Disabled Access');
+
+    -- Edit accommodation information
+    UPDATE accommodation
+    SET
+        accommodation_name = 'Updated Villa',  
+        country = 'Updated Country',           
+        city_code = '543210',                  
+        city = 'Updated City',                 
+        street = 'Updated Street',             
+        number = '5B',                         
+        price = 950.00,                      
+        payment = 'per_week',                 
+        description = 'New description',       
+        category = 'House',                    
+        number_of_rooms = 4,                   
+        available_slots = 1                    
+    WHERE accommodationID = accommodation_id_to_edit;
+    
+    -- Link accommodation with amenities (Wifi, Parking, Disabled Access)
+    INSERT INTO accommodation_amenities (accommodationID, amenityID)
+    VALUES 
+        (accommodation_id_to_edit, amenity_id_wifi),
+        (accommodation_id_to_edit, amenity_id_parking),
+        (accommodation_id_to_edit, amenity_id_disabled)
+    ON CONFLICT ON CONSTRAINT unique_accommodation_amenity DO NOTHING;
+END $$;

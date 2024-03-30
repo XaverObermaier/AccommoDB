@@ -23,7 +23,7 @@ CREATE TYPE public.gender_enum AS ENUM ('MALE', 'FEMALE', 'OTHER');
 -- create user table
 CREATE TABLE "public"."user" (
     userID           SERIAL PRIMARY KEY,
-    username         VARCHAR(255) NOT NULL UNIQUE, -- Make username unique
+    username         VARCHAR(255) NOT NULL UNIQUE,
     password_hash    VARCHAR(255) NOT NULL,
     firstname        VARCHAR(255) NOT NULL,
     lastname         VARCHAR(255) NOT NULL,
