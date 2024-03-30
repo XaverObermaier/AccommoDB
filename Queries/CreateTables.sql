@@ -1,5 +1,13 @@
 
--- dropping everything in the right order 
+-- dropping everything in the right order
+
+-- dropping booking
+DROP TABLE IF EXISTS booking;
+
+-- dropping amenities
+DROP TABLE IF EXISTS accommodation_amenities;
+DROP TABLE IF EXISTS amenity;
+
 -- dropping accommodatio table 
 DROP TABLE IF EXISTS accommodation;
 DROP TYPE IF EXISTS public.payment_enum;  
@@ -46,4 +54,40 @@ CREATE TABLE accommodation (
     available_slots    INT,
     userID             INT,
     CONSTRAINT fk_accommodation_user FOREIGN KEY (userID) REFERENCES "user" (userID) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+-- create amenity
+CREATE TABLE amenity (
+    amenityID SERIAL PRIMARY KEY,
+    Name      VARCHAR(100) NOT NULL
+);
+
+
+-- Create Connection between Accommodation und Amenities 
+CREATE TABLE accommodation_amenities (
+    accommodation_amenitiesID SERIAL PRIMARY KEY,
+    accommodationID           INT,
+    amenityID                 INT,
+    CONSTRAINT fk_accommodation_amenities_accommodationID FOREIGN KEY (accommodationID) REFERENCES accommodation (accommodationID),
+    CONSTRAINT fk_accommodation_amenities_amenityID FOREIGN KEY (amenityID) REFERENCES amenity (amenityID)
+);
+
+CREATE INDEX idx_accommodationID ON accommodation_amenities (accommodationID);
+CREATE INDEX idx_amenityID ON accommodation_amenities (amenityID);
+
+-- create booking
+CREATE TABLE booking (
+    bookingID SERIAL PRIMARY KEY,
+    guestID INT NULL,
+    hostID INT NULL,
+    accommodationID INT NULL,
+    checkInDate DATE NULL,
+    checkOutDate DATE NULL,
+    people_count INT NOT NULL,
+    room_count INT NOT NULL,
+    interested BOOLEAN DEFAULT FALSE,
+    accepted BOOLEAN DEFAULT FALSE,
+    CONSTRAINT fk_guest FOREIGN KEY (guestID) REFERENCES "user" (userID),
+    CONSTRAINT fk_host FOREIGN KEY (hostID) REFERENCES "user" (userID),
+    CONSTRAINT fk_accommodation FOREIGN KEY (accommodationID) REFERENCES accommodation (accommodationID)
 );
