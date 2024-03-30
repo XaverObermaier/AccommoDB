@@ -1,0 +1,21 @@
+-- To safe a new accommodation in the database 
+DO $$
+DECLARE
+    new_accommodation_id INT;
+    input_username VARCHAR(255) := 'User';  -- User who creates the Accommodation
+    user_id_for_insert INT;
+    accommodationName VARCHAR(255);
+BEGIN
+    -- Get UserId with help of function
+    SELECT userID INTO user_id_for_insert
+    FROM "public"."user"
+    WHERE username = input_username;
+
+    -- Insert Accommodation values
+    INSERT INTO accommodation (accommodation_name, country, city_code, city, street, number, price, payment, description, category, number_of_rooms, available_slots, userID)
+    VALUES ('User Villa', 'Thailand', '123456', 'Bangkok', 'UserStreet', '3', 800.00, 'per_month', 'Yes... I also have a mansion!', 'Villa', 6, 2, user_id_for_insert)
+    RETURNING accommodation_name INTO accommodationName;
+
+    -- Return success message 
+    RAISE NOTICE 'Unterkunft erfolgreich erstellt. Name: %', accommodationName;
+END $$;

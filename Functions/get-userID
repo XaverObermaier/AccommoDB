@@ -1,0 +1,17 @@
+-- Function, to get the userID from the Username 
+CREATE OR REPLACE FUNCTION get_userID(username_input VARCHAR(255))
+RETURNS INT
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    userID INT;
+BEGIN
+    -- Search for UserID belonging to Username
+    SELECT userID INTO userID
+    FROM "public"."user"
+    WHERE username = username_input;
+
+    -- Return UserID
+    RETURN userID;
+END;
+$$;
