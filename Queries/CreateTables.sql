@@ -20,10 +20,11 @@ DROP TYPE IF EXISTS public.gender_enum;
 -- create user table 
 CREATE TYPE public.gender_enum AS ENUM ('MALE', 'FEMALE', 'OTHER');
 
+-- create user table
 CREATE TABLE "public"."user" (
     userID           SERIAL PRIMARY KEY,
-    username         VARCHAR(255) NOT NULL,
-    password         VARCHAR(255) NOT NULL,
+    username         VARCHAR(255) NOT NULL UNIQUE, -- Make username unique
+    password_hash    VARCHAR(255) NOT NULL,
     firstname        VARCHAR(255) NOT NULL,
     lastname         VARCHAR(255) NOT NULL,
     gender           public.gender_enum, 
@@ -32,7 +33,7 @@ CREATE TABLE "public"."user" (
     email            VARCHAR(255) NOT NULL,
     telephone        VARCHAR(20),
     role             VARCHAR(50) DEFAULT 'USER',
-    registered_since DATE DEFAULT CURRENT_DATE 
+    registered_since DATE DEFAULT CURRENT_DATE
 );
 
 -- create accommodation table 

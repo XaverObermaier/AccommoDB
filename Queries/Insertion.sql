@@ -1,3 +1,5 @@
+
+-- Registrate User to the Database 
 DO $$
 DECLARE
     username_valid BOOLEAN;
@@ -18,7 +20,7 @@ BEGIN
     -- Check if the username is unique and the password is valid
     IF username_valid AND password_valid THEN
         -- Insert your SQL code to insert the user into the database here
-        INSERT INTO "public"."user" (username, password, firstname, lastname, gender, birthday, description, email, telephone, role)
+        INSERT INTO "public"."user" (username, password_hash, firstname, lastname, gender, birthday, description, email, telephone, role)
         VALUES (new_username, hash_password(new_password), 'DB', 'User', 'OTHER', '2003-03-31', 'Hello there - I am testing this amazing application!', 'db.user@gmail.com', '0123456789', 'USER');
         
         -- Perform additional actions here, such as success messages or redirects
