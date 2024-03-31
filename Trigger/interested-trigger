@@ -1,0 +1,20 @@
+-- Create or replace the trigger to set "interested" to true when a booking is made
+CREATE OR REPLACE FUNCTION set_interested_true()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Set "interested" to true when a new booking is made
+    IF NEW.guestID IS NOT NULL THEN
+        UPDATE booking
+        SET interested = TRUE
+        WHERE bookingID = NEW.bookingID;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create the trigger on the booking table
+CREATE TRIGGER set_interested_trigger
+AFTER INSERT ON booking
+FOR EACH ROW
+EXECUTE FUNCTION set_interested_true();

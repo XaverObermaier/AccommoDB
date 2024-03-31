@@ -1,0 +1,28 @@
+-- Create or replace the trigger to prevent duplicate bookings for the same accommodation and time period
+CREATE OR REPLACE FUNCTION check_duplicate_booking()
+RETURNS TRIGGER AS $$
+DECLARE
+    existing_booking RECORD;
+BEGIN
+    -- Check if there is an existing booking for the same guest, accommodation, and time period
+    SELECT INTO existing_booking *
+    FROM booking
+    WHERE guestID = NEW.guestID
+        AND accommodationID = NEW.accommodationID
+        AND ((checkInDate <= NEW.checkInDate AND checkOutDate >= NEW.checkInDate)
+            OR (checkInDate <= NEW.checkOutDate AND checkOutDate >= NEW.checkOutDate));
+
+    -- If an existing booking is found, raise an exception and prevent the new booking
+    IF FOUND THEN
+        RAISE EXCEPTION 'Duplicate booking detected for the same accommodation and time period';
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create the trigger on the booking table
+CREATE TRIGGER check_duplicate_booking_trigger
+BEFORE INSERT ON booking
+FOR EACH ROW
+EXECUTE FUNCTION check_duplicate_booking();

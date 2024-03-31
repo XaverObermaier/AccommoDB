@@ -1,0 +1,19 @@
+-- Trigger function to increment available slots in accommodation table when a booking is checked out
+CREATE OR REPLACE FUNCTION increment_available_slots_trigger_function()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Increment available slots by the room count of the checked-out booking
+    UPDATE accommodation
+    SET available_slots = available_slots + OLD.room_count
+    WHERE accommodationID = OLD.accommodationID;
+
+    RETURN OLD; -- Return the old row after the update
+END;
+$$ LANGUAGE plpgsql;
+
+-- Trigger to increment available slots in accommodation table when a booking is checked out
+CREATE TRIGGER increment_available_slots_trigger
+AFTER UPDATE OF checkOutDate ON booking
+FOR EACH ROW
+WHEN (OLD.checkOutDate IS NULL AND NEW.checkOutDate IS NOT NULL) -- Check if a booking is checked out
+EXECUTE FUNCTION increment_available_slots_trigger_function();

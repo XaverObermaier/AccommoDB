@@ -1,0 +1,28 @@
+-- Trigger function to decrement available_slots and prevent booking when slots reach zero
+CREATE OR REPLACE FUNCTION decrement_available_slots_trigger_function()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Check if the booking is both interested and accepted before decrementing available slots
+    IF NEW.interested = TRUE AND NEW.accepted = TRUE THEN
+        -- Decrement available_slots when a new booking is inserted
+        UPDATE accommodation
+        SET available_slots = available_slots - NEW.room_count
+        WHERE accommodationID = NEW.accommodationID;
+
+        -- Check if available_slots have reached zero after decrementing
+        IF (SELECT available_slots FROM accommodation WHERE accommodationID = NEW.accommodationID) < 0 THEN
+            RAISE EXCEPTION 'Accommodation is fully booked for the selected time period';
+        END IF;
+
+        RETURN NEW;
+    ELSE
+        RAISE EXCEPTION 'Booking must be both interested and accepted to decrement available slots';
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Trigger to decrement available_slots and prevent booking when slots reach zero
+CREATE TRIGGER decrement_available_slots_trigger
+BEFORE INSERT ON booking
+FOR EACH ROW
+EXECUTE FUNCTION decrement_available_slots_trigger_function();
