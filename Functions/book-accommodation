@@ -1,0 +1,63 @@
+-- Check if the user is the host of the accommodation
+CREATE OR REPLACE FUNCTION check_user_permission(username_input VARCHAR(255), accommodation_id_input INT)
+RETURNS BOOLEAN AS $$
+DECLARE
+    user_id_input INT;
+    user_id_accommodation INT;
+    host_id_accommodation INT;
+BEGIN
+    -- Get user ID based on the provided username using the get_userID function
+    user_id_input := get_userID(username_input);
+
+    IF user_id_input IS NOT NULL THEN
+        -- Get user ID associated with the accommodation
+        SELECT userID INTO user_id_accommodation
+        FROM accommodation
+        WHERE accommodationID = accommodation_id_input;
+
+        -- Check if the user is the host by comparing user IDs
+        IF user_id_accommodation = user_id_input THEN
+            RAISE EXCEPTION 'Host cannot book their own accommodations';
+        ELSE
+            RETURN TRUE;  -- User is not the host, can book the accommodation
+        END IF;
+    ELSE
+        RETURN FALSE;  -- User ID not found, permission denied
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create or replace the book_accommodation function
+CREATE OR REPLACE FUNCTION book_accommodation(username_input VARCHAR(255), accommodation_id_input INT, check_in_date_input DATE, check_out_date_input DATE, people_count_input INT, room_count_input INT)
+RETURNS BOOLEAN AS $$
+DECLARE
+    user_id_input INT;
+    user_id_accommodation INT;
+    booking_successful BOOLEAN := FALSE;
+BEGIN
+    -- Get user ID based on the provided username using the get_userID function
+    user_id_input := get_userID(username_input);
+
+    -- Check user permission using the check_user_permission function
+    IF check_user_permission(username_input, accommodation_id_input) THEN
+        -- Get host ID associated with the accommodation
+        SELECT a.userID INTO user_id_accommodation
+        FROM accommodation a
+        WHERE a.accommodationID = accommodation_id_input;
+
+        -- Insert booking data into the booking table if user is not the host
+        IF user_id_accommodation != user_id_input THEN
+            INSERT INTO booking (guestID, hostID, accommodationID, checkInDate, checkOutDate, people_count, room_count)
+            VALUES (user_id_input, user_id_accommodation, accommodation_id_input, check_in_date_input, check_out_date_input, people_count_input, room_count_input);
+
+            -- Set booking_successful to true if booking is successful
+            booking_successful := TRUE;
+        ELSE
+            RAISE EXCEPTION 'Host cannot book their own accommodations';
+        END IF;
+    END IF;
+
+    -- Return whether the booking was successful or not
+    RETURN booking_successful;
+END;
+$$ LANGUAGE plpgsql;

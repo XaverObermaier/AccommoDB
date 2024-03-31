@@ -46,7 +46,13 @@ DECLARE
        amenity_id_wifi INT;
        amenity_id_parking INT;
        amenity_id_disabled INT;
+       input_username VARCHAR(255) := 'Usr';  -- Try Username here 
 BEGIN
+    -- Check if User is owner of accommodation and therefore can edit it 
+    IF NOT check_user_permission(input_username, accommodation_id_to_edit) THEN
+        RAISE EXCEPTION 'Permission denied for user';
+    END IF;
+
     -- Fetch amenities 
     SELECT amenityID INTO amenity_id_wifi FROM amenity WHERE LOWER(Name) = LOWER('Wifi internet access');
     SELECT amenityID INTO amenity_id_parking FROM amenity WHERE LOWER(Name) = LOWER('Parking');

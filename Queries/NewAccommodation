@@ -6,10 +6,8 @@ DECLARE
     user_id_for_insert INT;
     accommodationName VARCHAR(255);
 BEGIN
-    -- Get UserId with help of function
-    SELECT userID INTO user_id_for_insert
-    FROM "public"."user"
-    WHERE username = input_username;
+    -- Get user ID based on the provided username using the get_userID function
+    user_id_input := get_userID(username_input);
 
     -- Insert Accommodation values
     INSERT INTO accommodation (accommodation_name, country, city_code, city, street, number, price, payment, description, category, number_of_rooms, available_slots, userID)

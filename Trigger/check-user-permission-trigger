@@ -1,0 +1,26 @@
+-- Check if user is host of accommodation and can therefore change it 
+CREATE OR REPLACE FUNCTION check_user_permission(username_input VARCHAR(255), accommodation_id_input INT)
+RETURNS BOOLEAN AS $$
+DECLARE
+    user_id_input INT;
+    user_id_accommodation INT;
+BEGIN
+    -- Get user ID based on the provided username using the get_userID function
+    user_id_input := get_userID(username_input);
+
+    IF user_id_input IS NOT NULL THEN
+        -- Get user ID associated with the accommodation
+        SELECT userID INTO user_id_accommodation
+        FROM accommodation
+        WHERE accommodationID = accommodation_id_input;
+
+        IF user_id_accommodation = user_id_input THEN
+            RETURN TRUE;  -- Permission granted if user IDs match
+        ELSE
+            RETURN FALSE;  -- Permission denied if user IDs don't match
+        END IF;
+    ELSE
+        RETURN FALSE;  -- User ID not found, permission denied
+    END IF;
+END;
+$$ LANGUAGE plpgsql;

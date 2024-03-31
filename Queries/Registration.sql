@@ -4,8 +4,8 @@ DO $$
 DECLARE
     username_valid BOOLEAN;
     password_valid BOOLEAN;
-    new_username VARCHAR(255) := 'Xaver';  -- Change Username here
-    new_password VARCHAR(255) := 'Obermaier';  -- Change Password here 
+    new_username VARCHAR(255) := 'Friedrich';  -- Change Username here
+    new_password VARCHAR(255) := 'Friedemann';  -- Change Password here 
 BEGIN
     -- Check if the username is unique
     username_valid := public.check_unique_username(new_username);
