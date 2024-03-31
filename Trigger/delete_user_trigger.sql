@@ -1,0 +1,7 @@
+CREATE TRIGGER delete_user_data
+AFTER DELETE ON Users
+FOR EACH ROW
+BEGIN
+   DELETE FROM Bookings WHERE UserID = OLD.UserID;
+   DELETE FROM Accommodations WHERE OwnerID = OLD.UserID;
+END;
