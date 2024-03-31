@@ -8,8 +8,11 @@ BEGIN
     WHERE accommodationID = OLD.accommodationID;
 
     RETURN OLD; -- Return the old row after the update
+    
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql; 
+
+
 
 -- Trigger to increment available slots in accommodation table when a booking is checked out
 CREATE TRIGGER increment_available_slots_trigger

@@ -1,0 +1,18 @@
+-- Function to insert ratings 
+CREATE OR REPLACE FUNCTION insert_rating(
+    booking_id_input INT,
+    rating_value_input INT,
+    comment_input TEXT
+) RETURNS VOID AS $$
+BEGIN
+    -- Check if booking is accepted from guest and host 
+    IF (SELECT interested FROM booking WHERE bookingID = booking_id_input) = TRUE
+       AND (SELECT accepted FROM booking WHERE bookingID = booking_id_input) = TRUE THEN
+        -- Insertion into the rating table 
+        INSERT INTO Rating (booking_id, rating_value, comment)
+        VALUES (booking_id_input, rating_value_input, comment_input);
+    ELSE
+        RAISE EXCEPTION 'A rating can only be submitted for bookings that are both interested and accepted';
+    END IF;
+END;
+$$ LANGUAGE plpgsql;

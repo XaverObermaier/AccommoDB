@@ -1,0 +1,2 @@
+-- Example for a rating
+SELECT insert_rating(5, 5, 'It was indeed - very comfortable! Thank you User!') AS result;

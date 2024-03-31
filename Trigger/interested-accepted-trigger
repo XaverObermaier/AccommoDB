@@ -1,0 +1,18 @@
+-- Trigger-Function,to make sure only bookings with agreement can be rated
+CREATE OR REPLACE FUNCTION check_booking_interest_and_acceptance()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Überprüfen, ob die Buchung sowohl interessiert als auch akzeptiert ist
+    IF (SELECT interested FROM booking WHERE bookingID = NEW.booking_id) = TRUE
+       AND (SELECT accepted FROM booking WHERE bookingID = NEW.booking_id) = TRUE THEN
+        RETURN NEW;
+    ELSE
+        RAISE EXCEPTION 'A rating can only be submitted for bookings that are both interested and accepted';
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER check_booking_interest_and_acceptance_trigger
+BEFORE INSERT ON Rating
+FOR EACH ROW
+EXECUTE FUNCTION check_booking_interest_and_acceptance();

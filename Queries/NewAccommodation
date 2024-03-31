@@ -2,8 +2,8 @@
 DO $$
 DECLARE
     new_accommodation_id INT;
-    input_username VARCHAR(255) := 'User';  -- User who creates the Accommodation
-    user_id_for_insert INT;
+    username_input VARCHAR(255) := 'User';  -- User who creates the Accommodation
+    user_id_input INT;
     accommodationName VARCHAR(255);
 BEGIN
     -- Get user ID based on the provided username using the get_userID function
@@ -11,7 +11,7 @@ BEGIN
 
     -- Insert Accommodation values
     INSERT INTO accommodation (accommodation_name, country, city_code, city, street, number, price, payment, description, category, number_of_rooms, available_slots, userID)
-    VALUES ('User Villa', 'Thailand', '123456', 'Bangkok', 'UserStreet', '3', 800.00, 'per_month', 'Yes... I also have a mansion!', 'Villa', 6, 2, user_id_for_insert)
+    VALUES ('User Villa', 'Thailand', '123456', 'Bangkok', 'UserStreet', '3', 800.00, 'per_month', 'Yes... I also have a mansion!', 'Villa', 6, 2, user_id_input)
     RETURNING accommodation_name INTO accommodationName;
 
     -- Return success message 

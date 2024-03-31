@@ -1,5 +1,7 @@
 -- dropping everything in the right order
 
+-- dropping rating table 
+DROP TABLE IF EXISTS rating;
 -- dropping booking table
 DROP TABLE IF EXISTS booking;
 
@@ -94,3 +96,15 @@ CREATE TABLE booking (
     CONSTRAINT fk_host FOREIGN KEY (hostID) REFERENCES "user" (userID),
     CONSTRAINT fk_accommodation FOREIGN KEY (accommodationID) REFERENCES accommodation (accommodationID)
 );
+
+-- Tabelle Rating mit Rating-Trigger
+CREATE TABLE Rating (
+    rating_id SERIAL PRIMARY KEY,
+    booking_id INT NOT NULL,
+    rating_value INT NOT NULL,
+    comment TEXT NULL,
+    CONSTRAINT fk_booking_id FOREIGN KEY (booking_id) REFERENCES booking (bookingID)
+);
+
+-- Index für booking_id
+CREATE INDEX idx_booking_id ON Rating (booking_id);

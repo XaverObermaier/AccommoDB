@@ -4,7 +4,6 @@ RETURNS BOOLEAN AS $$
 DECLARE
     user_id_input INT;
     user_id_accommodation INT;
-    host_id_accommodation INT;
 BEGIN
     -- Get user ID based on the provided username using the get_userID function
     user_id_input := get_userID(username_input);
@@ -39,23 +38,31 @@ BEGIN
     user_id_input := get_userID(username_input);
 
     -- Check user permission using the check_user_permission function
-    IF check_user_permission(username_input, accommodation_id_input) THEN
-        -- Get host ID associated with the accommodation
-        SELECT a.userID INTO user_id_accommodation
-        FROM accommodation a
-        WHERE a.accommodationID = accommodation_id_input;
+    BEGIN
+        IF check_user_permission(username_input, accommodation_id_input) THEN
+            -- Get host ID associated with the accommodation
+            SELECT a.userID INTO user_id_accommodation
+            FROM accommodation a
+            WHERE a.accommodationID = accommodation_id_input;
 
-        -- Insert booking data into the booking table if user is not the host
-        IF user_id_accommodation != user_id_input THEN
-            INSERT INTO booking (guestID, hostID, accommodationID, checkInDate, checkOutDate, people_count, room_count)
-            VALUES (user_id_input, user_id_accommodation, accommodation_id_input, check_in_date_input, check_out_date_input, people_count_input, room_count_input);
+            -- Insert booking data into the booking table if user is not the host
+            IF user_id_accommodation != user_id_input THEN
+                INSERT INTO booking (guestID, hostID, accommodationID, checkInDate, checkOutDate, people_count, room_count)
+                VALUES (user_id_input, user_id_accommodation, accommodation_id_input, check_in_date_input, check_out_date_input, people_count_input, room_count_input);
 
-            -- Set booking_successful to true if booking is successful
-            booking_successful := TRUE;
+                -- Set booking_successful to true if booking is successful
+                booking_successful := TRUE;
+            ELSE
+                RAISE EXCEPTION 'Host cannot book their own accommodations';
+            END IF;
         ELSE
-            RAISE EXCEPTION 'Host cannot book their own accommodations';
+            -- Handle the case where the user is the host
+            RAISE EXCEPTION 'User does not have permission to book this accommodation';
         END IF;
-    END IF;
+    EXCEPTION
+        WHEN OTHERS THEN
+            RAISE EXCEPTION 'An error occurred while booking the accommodation';
+    END;
 
     -- Return whether the booking was successful or not
     RETURN booking_successful;
